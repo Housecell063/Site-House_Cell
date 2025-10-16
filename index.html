@@ -1,0 +1,673 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Loja de Celulares</title>
+
+  <style>
+    /* ===== Reset ===== */
+    * { margin:0; padding:0; box-sizing:border-box; font-family:'Segoe UI', sans-serif; }
+
+    html, body {
+      height: 100%;
+      background:#f5f5f5;
+      color:#333;
+      display:flex;
+      flex-direction:column;
+    }
+
+    main { flex:1; }
+
+    /* ===== Header minimalista e sofisticado ===== */
+    header {
+      background:white;
+      color:#0d47a1;
+      padding:40px 5%;
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      justify-content:center;
+      text-align:center;
+      box-shadow:0 2px 10px rgba(0,0,0,0.05);
+      position:relative;
+    }
+
+    .logo {
+      width:130px;
+      height:130px;
+      border-radius:50%;
+      overflow:hidden;
+      box-shadow:0 2px 10px rgba(0,0,0,0.15);
+      margin-bottom:20px;
+    }
+
+    .logo img {
+      width:100%;
+      height:100%;
+      object-fit:cover;
+      transition:transform 0.3s ease;
+    }
+
+    .logo img:hover { transform:scale(1.05); }
+
+    .header-phrase {
+      font-size:1.8rem;
+      font-weight:600;
+      color:#0d47a1;
+      max-width:700px;
+      line-height:1.4;
+    }
+
+    /* ===== ÍCONE DO CARRINHO ===== */
+    .icons {
+      position: absolute;
+      top: 20px;
+      right: 40px;
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      font-size: 1.8rem;
+      cursor: pointer;
+    }
+
+    .icon-wrapper {
+      position: relative;
+      color: #0d47a1;
+      transition: 0.3s;
+    }
+
+    .icon-wrapper:hover {
+      transform: scale(1.1);
+    }
+
+    .badge {
+      position: absolute;
+      top: -8px;
+      right: -10px;
+      background-color: #1565c0;
+      color: white;
+      border-radius: 50%;
+      padding: 3px 7px;
+      font-size: 0.75rem;
+    }
+
+    /* ===== DROPDOWN DO CARRINHO ===== */
+    .dropdown {
+      display: none;
+      position: absolute;
+      right: 0;
+      top: 50px;
+      background-color: #ffffff;
+      color: #333;
+      width: 320px;
+      max-height: 380px;
+      overflow-y: auto;
+      border-radius: 14px;
+      padding: 10px 15px;
+      box-shadow: 0 8px 16px rgba(0,0,0,0.15);
+      list-style: none;
+      z-index: 1000;
+      transition: all 0.3s ease;
+    }
+
+    .dropdown li {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin: 8px 0;
+      padding: 8px;
+      border-radius: 10px;
+      background-color: #fafafa;
+      transition: 0.2s;
+    }
+
+    .dropdown li:hover {
+      background-color: #e3f2fd;
+    }
+
+    .mini-img {
+      width: 45px;
+      height: 45px;
+      border-radius: 8px;
+      object-fit: cover;
+      margin-right: 10px;
+    }
+
+    .item-info {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      text-align: left;
+      font-size: 0.9rem;
+    }
+
+    .item-info span:first-child {
+      font-weight: 600;
+      color: #0d47a1;
+    }
+
+    .remove-button {
+      background: none;
+      border: none;
+      color: #d63384;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+    .remove-button:hover {
+      transform: scale(1.2);
+    }
+
+    /* Botão de finalizar */
+    .finalizar-btn {
+      width: 100%;
+      margin-top: 10px;
+      padding: 10px;
+      background-color: #0d47a1;
+      color: white;
+      border: none;
+      border-radius: 10px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+    .finalizar-btn:hover {
+      background-color: #1565c0;
+    }
+
+    /* ===== Seções ===== */
+    .section { padding:60px 20px; text-align:center; }
+    .section h2 { font-size:2rem; margin-bottom:25px; color:#0d47a1; text-align:center; }
+
+    /* ===== Produtos ===== */
+    .products {
+      display:grid; grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
+      gap:25px; max-width:1000px; margin:0 auto;
+    }
+
+    .product-card {
+      background:white; border-radius:15px; overflow:hidden;
+      box-shadow:0 6px 18px rgba(0,0,0,0.1); text-align:center;
+      transition:0.3s;
+    }
+
+    .product-card:hover { transform:translateY(-5px); }
+
+    .product-card img { width:100%; height:200px; object-fit:cover; }
+
+    .product-card h3 { margin:15px 0 5px; color:#0d47a1; }
+
+    .product-card p { color:#555; }
+
+    .product-card button {
+      display:inline-block; margin:15px 0 20px; padding:12px 25px;
+      background:#0d47a1; color:white; border-radius:8px; border:none;
+      cursor:pointer; transition:0.3s; font-weight:600;
+    }
+    .product-card button:hover { background:#1565c0; }
+
+    /* ===== Footer ===== */
+    footer {
+      background:#222; color:white; text-align:center;
+      padding:25px 20px;
+      margin-top:auto;
+      box-shadow:0 -4px 15px rgba(0,0,0,0.2);
+    }
+
+    /* ===== WhatsApp ===== */
+    .whatsapp-btn {
+      position:fixed; bottom:20px; right:20px;
+      background:#25d366; padding:15px 20px; border-radius:50px;
+      color:white; font-weight:bold; text-decoration:none;
+      box-shadow:0 5px 15px rgba(0,0,0,0.3);
+      transition:0.3s;
+    }
+    .whatsapp-btn:hover { background:#1ebd5a; }
+  </style>
+</head>
+<body>
+
+  <!-- Header -->
+  <header>
+    <div class="logo">
+      <img src="house cell.jpg" alt="Logo da Loja" />
+    </div>
+    <div class="header-phrase">
+      A tecnologia que conecta você ao futuro. ✨
+    </div>
+
+    <!-- Ícone do carrinho -->
+    <div class="icons">
+      <div class="icon-wrapper" onclick="toggleCarrinho()">🛒
+        <span class="badge" id="carrinho-count">0</span>
+        <ul class="dropdown" id="dropdown-carrinho"></ul>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <!-- Produtos -->
+    <section class="section" id="produtos">
+      <h2>Celulares em Destaque</h2>
+      <div class="products">
+        <div class="product-card">
+          <img src="IPhone 14 128gb.jpg" alt="iPhone" />
+          <h3>iPhone 14 128gb</h3>
+          <p>R$ 3.899,00</p>
+          <small>Em até 10x sem juros</small>
+          <button onclick="adicionarAoCarrinho('iPhone 14 Pro')">Adicionar ao Carrinho</button>
+        </div>
+        <div class="product-card">
+          <img src="IPhone 13 128gb.jpg" alt="IPhone 13 128gb" />
+          <h3>IPhone 13 128gb</h3>
+          <p>R$ 3.390,00</p>
+          <small>Em até 10x semm juros</small>
+          <button onclick="adicionarAoCarrinho('IPhone 13 128gb')">Adicionar ao Carrinho</button>
+        </div>
+        <div class="product-card">
+          <img src="IPhone 16 128gb.jpg" alt="IPhone 16 128gb" />
+          <h3>IPhone 16 128gb</h3>
+          <p>R$ 5.099,00</p>
+          <small>Em até 10x sem juros</small>
+          <button onclick="adicionarAoCarrinho('IPhone 16 128gb')">Adicionar ao Carrinho</button>
+        </div>
+
+        <div class="product-card">
+          <img src="Iphones .jpg" alt="IPhones SemiNovos" />
+          <h3>IPhones SemiNovos</h3>
+          <p>A partir de R$ 1.799,00</p>
+          <small>Em até 10x sem juros</small>
+          <button onclick="adicionarAoCarrinho('IPhones SemiNovos')">Adicionar ao Carrinho</button>
+        </div>
+
+        <div class="product-card">
+          <img src="X7.jpg" alt="Poco X7 PRO 256gb" />
+          <h3>Poco X7 PRO 256gb/8RAM</h3>
+          <p>R$ 2.190,00</p>
+          <small>Em até 10x sem juros</small>
+          <button onclick="adicionarAoCarrinho('Poco X7 PRO 256gb')">Adicionar ao Carrinho</button>
+        </div>
+
+        <div class="product-card">
+          <img src="60X.jpg" alt="Note 60X 64gb" />
+          <h3>Note 60X 64gb</h3>
+          <p>R$ 699,00</p>
+          <small>Em até 10x se juros</small>
+          <button onclick="adicionarAoCarrinho('Note 60X 64gb')">Adicionar ao Carrinho</button>
+        </div>
+
+        <div class="product-card">
+          <img src="15C.jpg" alt="Redmi 15C 256gb" />
+          <h3>Redmi 15C 256gb</h3>
+          <p>R$ 1.150,00</p>
+          <small>Em até 10x sem juros</small>
+          <button onclick="adicionarAoCarrinho('Redmi 15C 256gb')">Adicionar ao Carrinho</button>
+        </div>
+
+        <div class="product-card">
+          <img src="C71.jpg" alt="Poco C71 128gb" />
+          <h3>Poco C71 128gb</h3>
+          <p>R$ 895,00</p>
+          <small>Em até 10x sem juros</small>
+          <button onclick="adicionarAoCarrinho('Poco C71 128gb')">Adicionar ao Carrinho</button>
+        </div>
+
+        <div class="product-card">
+          <img src="A5.jpg" alt="Redmi A5 128gb" />
+          <h3>Redmi A5 128gb</h3>
+          <p>R$ 895,00</p>
+          <small>Em até 10x sem juros</small>
+          <button onclick="adicionarAoCarrinho('Redmi A5 128gb')">Adicionar ao Carrinho</button>
+        </div>
+
+        <div class="product-card">
+          <img src="Note 14 pro 4G.jpg" alt="Note 14 pro 4G" />
+          <h3>Note 14 pro 4G</h3>
+          <p>R$ 1.795,00</p>
+          <small>Em até 10x sem juros</small>
+          <button onclick="adicionarAoCarrinho('Note 14 pro 4G')">Adicionar ao Carrinho</button>
+        </div>
+
+        <div class="product-card">
+          <img src="A06.jpg" alt="Galaxy A06 128gb" />
+          <h3>Galaxy A06 128gb</h3>
+          <p>R$ 990,00</p>
+          <small>Em até 10x sem juros</small>
+          <button onclick="adicionarAoCarrinho('Galaxy A06 128gb')">Adicionar ao Carrinho</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Caixas de Som -->
+    <section class="section">
+      <h2>Caixas de Som</h2>
+      <div class="products">
+        <div class="product-card">
+          <img src="Caixa de som gold 8W resistente a agua .jpg" alt="Caixa de som gold 8W resistente a agua">
+          <h3>Caixa de som gold 8W resistente a agua</h3>
+          <p>R$ 180,00</p>
+          <button onclick="adicionarAoCarrinho('Caixa de som gold 8W resistente a agua')">Adicionar ao Carrinho</button>
+        </div>
+        <div class="product-card">
+          <img src="Caixa de som gold 20W resistente a agua .jpg" alt="Caixa de som gold 20W resistente a agua">
+          <h3>Caixa de som gold 20W resistente a agua</h3>
+          <p>R$ 225,00</p>
+          <button onclick="adicionarAoCarrinho('Caixa de som gold 20W resistente a agua')">Adicionar ao Carrinho</button>
+        </div>
+        <div class="product-card">
+          <img src="Bombox AIWA plus.jpg" alt="Bombox AIWA plus">
+          <h3>Bombox AIWA plus</h3>
+          <p>R$ 1.890,00</p>
+          <small>Em até 10x sem juros</small>
+          <button onclick="adicionarAoCarrinho('Bombox AIWA plus')">Adicionar ao Carrinho</button>
+        </div>
+        <div class="product-card">
+          <img src="Bombox 4.jpg" alt="Bombox 4">
+          <h3>Bombox 4</h3>
+          <p>R$ 3.250,00</p>
+          <small>Em até 10x sem juros</small>
+          <button onclick="adicionarAoCarrinho('Bombox 4')">Adicionar ao Carrinho</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Acessórios -->
+    <section class="section">
+      <h2>Acessórios</h2>
+      <div class="products">
+        <div class="product-card">
+          <img src="Cabo lightining tipo c.jpg" alt="Cabo lightining tipo c">
+          <h3>Cabo lightining tipo c</h3>
+          <p>R$ 35,00</p>
+          <button onclick="adicionarAoCarrinho('Cabo lightining tipo c')">Adicionar ao Carrinho</button>
+        </div>
+        <div class="product-card">
+          <img src="Cabo lightning.jpg" alt="Cabo lightning">
+          <h3>Cabo lightning</h3>
+          <p>R$ 25,00</p>
+          <button onclick="adicionarAoCarrinho('Cabo lightning')">Adicionar ao Carrinho</button>
+        </div>
+        <div class="product-card">
+          <img src="Cabo tipo c de 1 metro.jpg" alt="Cabo tipo c de 1 metro">
+          <h3>Cabo tipo c de 1 metro</h3>
+          <p>R$ 25,00</p>
+          <button onclick="adicionarAoCarrinho('Cabo tipo c de 1 metro')">Adicionar ao Carrinho</button>
+        </div>
+
+        <div class="product-card">
+          <img src="Cabo USB de 1 metro.jpg" alt="Cabo USB de 1 metro">
+          <h3>Cabo USB de 1 metro</h3>
+          <p>R$ 25,00</p>
+          <button onclick="adicionarAoCarrinho('Cabo USB de 1 metro')">Adicionar ao Carrinho</button>
+        </div>
+
+        <div class="product-card">
+          <img src="Capinhas para celular.jpg" alt="Capinhas para celular">
+          <h3>Capinhas para celular</h3>
+          <p>R$ 499</p>
+          <button onclick="adicionarAoCarrinho('Capinhas para celular')">Adicionar ao Carrinho</button>
+        </div>
+
+        <div class="product-card">
+          <img src="Carregador para IPhone.jpg" alt="Carregador para IPhone">
+          <h3>Carregador para IPhone</h3>
+          <p>R$ 45,00</p>
+          <button onclick="adicionarAoCarrinho('Carregador para IPhone')">Adicionar ao Carrinho</button>
+        </div>
+
+        <div class="product-card">
+          <img src="Carregador portatil universal H'MASTON.jpg" alt="Carregador portatil universal H'MASTON">
+          <h3>Carregador portatil universal H'MASTON</h3>
+          <p>R$ 90,00</p>
+          <button onclick="adicionarAoCarrinho('My Watch')">Adicionar ao Carrinho</button>
+        </div>
+
+        <div class="product-card">
+          <img src="Carregador tipo c 2.jpg" alt="Carregador tipo c Turbo">
+          <h3>Carregador tipo c Turbo</h3>
+          <p>R$ 55,00</p>
+          <button onclick="adicionarAoCarrinho('Carregador tipo c Turbo')">Adicionar ao Carrinho</button>
+        </div>
+
+        <div class="product-card">
+          <img src="Carregador tipo c para IPhone.jpg" alt="Carregador tipo c para IPhone">
+          <h3>Carregador tipo c para IPhone</h3>
+          <p>R$ 55,00</p>
+          <button onclick="adicionarAoCarrinho('Carregador tipo c para IPhone')">Adicionar ao Carrinho</button>
+        </div>
+
+        <div class="product-card">
+          <img src="Carregador tipo C.jpg" alt="Carregador tipo C">
+          <h3>Carregador tipo C</h3>
+          <p>R$ 45,00</p>
+          <button onclick="adicionarAoCarrinho('Carregador tipo C')">Adicionar ao Carrinho</button>
+        </div>
+
+        <div class="product-card">
+          <img src="Carregador USB duplo.jpg" alt="Carregador USB duplo">
+          <h3>Carregador USB duplo</h3>
+          <p>R$ 35,00</p>
+          <button onclick="adicionarAoCarrinho('Carregador USB duplo')">Adicionar ao Carrinho</button>
+        </div>
+
+        <div class="product-card">
+          <img src="Carregador USB.jpg" alt="Carregador USB">
+          <h3>Carregador USB</h3>
+          <p>R$ 45,00</p>
+          <button onclick="adicionarAoCarrinho('Carregador USB')">Adicionar ao Carrinho</button>
+        </div>
+
+        <div class="product-card">
+          <img src="Controles TV BOX  TV.jpg" alt="Controles TV BOX/TV">
+          <h3>Controles TV BOX/TV</h3>
+          <p>R$ 35,00</p>
+          <button onclick="adicionarAoCarrinho('Controles TV BOX/TV')">Adicionar ao Carrinho</button>
+        </div>
+
+        <div class="product-card">
+          <img src="Fone bluetooth Air Dots.jpg" alt="Fone bluetooth Air Dots">
+          <h3>Fone bluetooth Air Dots</h3>
+          <p>R$ 75,00</p>
+          <button onclick="adicionarAoCarrinho('Fone bluetooth Air Dots')">Adicionar ao Carrinho</button>
+        </div>
+
+        <div class="product-card">
+          <img src="Fone JBL TUNE 900.jpg" alt="Fone JBL TUNE 900">
+          <h3>Fone JBL TUNE 900</h3>
+          <p>R$ 130,00</p>
+          <button onclick="adicionarAoCarrinho('Fone JBL TUNE 900')">Adicionar ao Carrinho</button>
+        </div>
+
+        <div class="product-card">
+          <img src="Fone Lehmox.jpg" alt="Fone Lehmox">
+          <h3>Fone Lehmox</h3>
+          <p>R$ 145,00</p>
+          <button onclick="adicionarAoCarrinho('Fone Lehmox')">Adicionar ao Carrinho</button>
+        </div>
+
+        <div class="product-card">
+          <img src="Fone MDR-957.jpg" alt="Fone MDR-957">
+          <h3>Fone MDR-957</h3>
+          <p>R$ 130,00</p>
+          <button onclick="adicionarAoCarrinho('Fone MDR-957')">Adicionar ao Carrinho</button>
+        </div>
+
+        <div class="product-card">
+          <img src="Fones de ouvido Gold PRO.jpg" alt="Fones de ouvido Gold PRO">
+          <h3>Fones de ouvido Gold PRO</h3>
+          <p>R$ 190,00</p>
+          <button onclick="adicionarAoCarrinho('Fones de ouvido Gold PRO')">Adicionar ao Carrinho</button>
+        </div>
+
+        <div class="product-card">
+          <img src="Microfone basike.jpg" alt="Microfone basike">
+          <h3>Microfone basike</h3>
+          <p>R$ 499</p>
+          <button onclick="adicionarAoCarrinho('Microfone basike')">Adicionar ao Carrinho</button>
+        </div>
+
+        <div class="product-card">
+          <img src="Powerbank Gold de 10000 mah.jpg" alt="Powerbank Gold de 10000 mah">
+          <h3>Powerbank Gold de 10000 mah</h3>
+          <p>R$ 130,00</p>
+          <button onclick="adicionarAoCarrinho('Powerbank Gold de 10000 mah')">Adicionar ao Carrinho</button>
+        </div>
+
+        <div class="product-card">
+          <img src="Powerbank Gold de 20000 mah.jpg" alt="Powerbank Gold de 20000 mah">
+          <h3>Powerbank Gold de 20000 mah</h3>
+          <p>R$ 190,00</p>
+          <button onclick="adicionarAoCarrinho('Powerbank Gold de 20000 mah')">Adicionar ao Carrinho</button>
+        </div>
+
+        <div class="product-card">
+          <img src="Smart Band 8.jpg" alt="Smart Band 8">
+          <h3>Smart Band 8</h3>
+          <p>R$ 390,00</p>
+          <button onclick="adicionarAoCarrinho('Smart Band 8')">Adicionar ao Carrinho</button>
+        </div>
+
+        <div class="product-card">
+          <img src="TV BOX.jpg" alt="TV BOX">
+          <h3>TV BOX</h3>
+          <p>R$ 225,00</p>
+          <button onclick="adicionarAoCarrinho('TV BOX')">Adicionar ao Carrinho</button>
+      </div>
+
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <p>📍 Loja de Celulares - Dianópolis/TO</p>
+    <p>📞 (63) 99999-0000</p>
+    <p>&copy; 2025 Loja de Celulares - Todos os direitos reservados</p>
+  </footer>
+
+  <a href="https://wa.me/5563999990000" target="_blank" class="whatsapp-btn">💬 Fale no WhatsApp</a>
+
+  <script>
+    // ✅ Limpar o localStorage antigo para evitar que o contador comece com número errado
+    localStorage.removeItem("carrinho");
+
+    // Inicializa carrinho vazio
+    let carrinho = [];
+
+    // === TODOS OS PRODUTOS PRESENTES NA PÁGINA ===
+  const produtos = {
+    // === CELULARES ===
+    "iPhone 14 128gb": { preco: "R$ 3.899,00", img: "IPhone 14 128gb.jpg" },
+    "IPhone 13 128gb": { preco: "R$ 3.390,00", img: "IPhone 13 128gb.jpg" },
+    "IPhone 16 128gb": { preco: "R$ 5.099,00", img: "IPhone 16 128gb.jpg" },
+    "IPhones SemiNovos": { preco: "A partir de R$ 1.799,00", img: "Iphones .jpg" },
+    "Poco X7 PRO 256gb": { preco: "R$ 2.190,00", img: "X7.jpg" },
+    "Note 60X 64gb": { preco: "R$ 699,00", img: "60X.jpg" },
+    "Redmi 15C 256gb": { preco: "R$ 1.150,00", img: "15C.jpg" },
+    "Poco C71 128gb": { preco: "R$ 895,00", img: "C71.jpg" },
+    "Redmi A5 128gb": { preco: "R$ 895,00", img: "A5.jpg" },
+    "Note 14 pro 4G": { preco: "R$ 1.795,00", img: "Note 14 pro 4G.jpg" },
+    "Galaxy A06 128gb": { preco: "R$ 990,00", img: "A06.jpg" },
+
+    // === CAIXAS DE SOM ===
+    "Caixa de som gold 8W resistente a agua": { preco: "R$ 180,00", img: "Caixa de som gold 8W resistente a agua .jpg" },
+    "Caixa de som gold 20W resistente a agua": { preco: "R$ 225,00", img: "Caixa de som gold 20W resistente a agua .jpg" },
+    "Bombox AIWA plus": { preco: "R$ 1.890,00", img: "Bombox AIWA plus.jpg" },
+    "Bombox 4": { preco: "R$ 3.250,00", img: "Bombox 4.jpg" },
+
+    // === ACESSÓRIOS ===
+    "Cabo lightining tipo c": { preco: "R$ 35,00", img: "Cabo lightining tipo c.jpg" },
+    "Cabo lightning": { preco: "R$ 25,00", img: "Cabo lightning.jpg" },
+    "Cabo tipo c de 1 metro": { preco: "R$ 25,00", img: "Cabo tipo c de 1 metro.jpg" },
+    "Cabo USB de 1 metro": { preco: "R$ 25,00", img: "Cabo USB de 1 metro.jpg" },
+    "Capinhas para celular": { preco: "R$ 499,00", img: "Capinhas para celular.jpg" },
+    "Carregador para IPhone": { preco: "R$ 45,00", img: "Carregador para IPhone.jpg" },
+    "Carregador portatil universal H'MASTON": { preco: "R$ 90,00", img: "Carregador portatil universal H'MASTON.jpg" },
+    "Carregador tipo c Turbo": { preco: "R$ 55,00", img: "Carregador tipo c 2.jpg" },
+    "Carregador tipo c para IPhone": { preco: "R$ 55,00", img: "Carregador tipo c para IPhone.jpg" },
+    "Carregador tipo C": { preco: "R$ 45,00", img: "Carregador tipo C.jpg" },
+    "Carregador USB duplo": { preco: "R$ 35,00", img: "Carregador USB duplo.jpg" },
+    "Carregador USB": { preco: "R$ 45,00", img: "Carregador USB.jpg" },
+    "Controles TV BOX/TV": { preco: "R$ 35,00", img: "Controles TV BOX  TV.jpg" },
+    "Fone bluetooth Air Dots": { preco: "R$ 75,00", img: "Fone bluetooth Air Dots.jpg" },
+    "Fone JBL TUNE 900": { preco: "R$ 130,00", img: "Fone JBL TUNE 900.jpg" },
+    "Fone Lehmox": { preco: "R$ 145,00", img: "Fone Lehmox.jpg" },
+    "Fone MDR-957": { preco: "R$ 130,00", img: "Fone MDR-957.jpg" },
+    "Fones de ouvido Gold PRO": { preco: "R$ 190,00", img: "Fones de ouvido Gold PRO.jpg" },
+    "Microfone basike": { preco: "R$ 499,00", img: "Microfone basike.jpg" },
+    "Powerbank Gold de 10000 mah": { preco: "R$ 130,00", img: "Powerbank Gold de 10000 mah.jpg" },
+    "Powerbank Gold de 20000 mah": { preco: "R$ 190,00", img: "Powerbank Gold de 20000 mah.jpg" },
+    "Smart Band 8": { preco: "R$ 390,00", img: "Smart Band 8.jpg" },
+    "TV BOX": { preco: "R$ 225,00", img: "TV BOX.jpg" }
+  };
+
+    function adicionarAoCarrinho(nome) {
+      carrinho.push(nome);
+      salvarCarrinho();
+      atualizarCarrinho();
+    }
+
+    function removerDoCarrinho(index) {
+      carrinho.splice(index, 1);
+      salvarCarrinho();
+      atualizarCarrinho();
+    }
+
+    function salvarCarrinho() {
+      localStorage.setItem("carrinho", JSON.stringify(carrinho));
+    }
+
+    function atualizarCarrinho() {
+      const lista = document.getElementById("dropdown-carrinho");
+      lista.innerHTML = "";
+      if (carrinho.length === 0) {
+        lista.innerHTML = "<li style='text-align:center; padding:15px;'>Seu carrinho está vazio 🛍️</li>";
+        document.getElementById("carrinho-count").innerText = "0";
+        return;
+      }
+
+      carrinho.forEach((item, index) => {
+        const produto = produtos[item];
+        if (!produto) return;
+
+        const li = document.createElement("li");
+        li.innerHTML = `
+          <img src="${produto.img}" class="mini-img" alt="${item}">
+          <div class="item-info">
+            <span>${item}</span>
+            <small>${produto.preco}</small>
+          </div>
+          <button class="remove-button" onclick="removerDoCarrinho(${index})">✕</button>
+        `;
+        lista.appendChild(li);
+      });
+
+      const liFinal = document.createElement("li");
+      liFinal.style.background = "none";
+      liFinal.innerHTML = `<button class="finalizar-btn" onclick="finalizarCarrinho()">Finalizar Compra</button>`;
+      lista.appendChild(liFinal);
+
+      document.getElementById("carrinho-count").innerText = carrinho.length;
+    }
+
+    function finalizarCarrinho() {
+      if (carrinho.length === 0) {
+        alert("Carrinho vazio!");
+        return;
+      }
+      const texto = encodeURIComponent("Quero comprar: " + carrinho.join(", "));
+      carrinho = [];
+      salvarCarrinho();
+      atualizarCarrinho();
+      window.open("https://wa.me/5563992887772?text=" + texto, "_blank");
+    }
+
+    function toggleCarrinho() {
+      const dropdown = document.getElementById("dropdown-carrinho");
+      dropdown.style.display = dropdown.style.display === "block" ? "none" : "block";
+    }
+
+    window.onload = atualizarCarrinho;
+  </script>
+</body>
+</html>
