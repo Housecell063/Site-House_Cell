@@ -832,7 +832,7 @@
         alert("Carrinho vazio!");
         return;
       }
-      const texto = encodeURIComponent("Quero comprar: " + carrinho.join(", "));
+      const texto = encodeURIComponent("Olá,Quero comprar o(a): " + carrinho.join(", "));
       carrinho = [];
       salvarCarrinho();
       atualizarCarrinho();
@@ -848,6 +848,7 @@
   </script>
 </body>
 </html>
+
 
 
 
