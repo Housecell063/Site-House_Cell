@@ -1033,31 +1033,36 @@
     }
 
     function finalizarCarrinho() {
-      if (carrinho.length === 0) {
-        alert("Carrinho vazio!");
-        return;
-      }
-      // agrupar itens para mensagem
-      const contagem = {};
-      carrinho.forEach(name => contagem[name] = (contagem[name] || 0) + 1);
+  if (carrinho.length === 0) {
+    alert("Carrinho vazio!");
+    return;
+  }
 
-      let mensagem = "Olá! Tenho interesse nos seguintes itens:%0A";
-      Object.keys(contagem).forEach(name => {
-        mensagem += `- ${name} (x${contagem[name]})%0A`;
-      });
+  // agrupar itens para a mensagem
+  const contagem = {};
+  carrinho.forEach(name => contagem[name] = (contagem[name] || 0) + 1);
 
-      const total = calcularTotal();
-      mensagem += `%0ATotal: ${formatBRL(total)}%0A%0APor favor, me informe como proceder com o pagamento e retirada.`;
+  let mensagemTexto = "Olá! Tenho interesse nos seguintes itens:\n";
+  Object.keys(contagem).forEach(name => {
+    mensagemTexto += `- ${name} (x${contagem[name]})\n`;
+  });
 
-      // limpa carrinho após enviar
-      carrinho = [];
-      salvarCarrinho();
-      atualizarCarrinho();
+  const total = calcularTotal();
+  mensagemTexto += `\nTotal: ${formatBRL(total)}\n\nPor favor, me informe como proceder com o pagamento e retirada.`;
 
-      // abre WhatsApp com mensagem (mesmo número já presente no seu site)
-      const url = `https://wa.me/${63991071001}?text=${Olá}`;
-      window.open(url, "_blank");
-    }
+  // limpar carrinho local antes do redirecionamento
+  carrinho = [];
+  salvarCarrinho();
+  atualizarCarrinho();
+
+  // usar encodeURIComponent para não quebrar a URL (caracteres especiais, R$, espaços, etc.)
+  const textoCodificado = encodeURIComponent(mensagemTexto);
+
+  // abrir WhatsApp na mesma aba (redirect). Se preferir nova aba, troque por window.open(url, "_blank")
+  const url = `https://wa.me/${WHATSAPP_NUMBER}?text=${textoCodificado}`;
+  window.location.href = url;
+}
+
 
     function toggleCarrinho() {
       const dropdown = document.getElementById("dropdown-carrinho");
